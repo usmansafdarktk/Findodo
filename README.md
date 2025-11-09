@@ -8,7 +8,7 @@ This project is managed with Poetry.
 
 1.  Clone the repository:
     ```
-    git clone [https://github.com/your-username/findodo.git](https://github.com/your-username/findodo.git)
+    git clone git@github.com:usmansafdarktk/Findodo.git
     cd findodo
     ```
 
@@ -59,3 +59,4 @@ dataset_text = generator.generate_from_texts(
 )
 print(dataset_text.items)
 ```
+
