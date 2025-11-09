@@ -1,0 +1,50 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "findodo"
+version = "0.1.0"
+description = "Robust financial dataset generation."
+authors = [
+    "Ayesha Gull ayeshaiqbal2592@gmail.com",
+    "Muhammad Usman Safder <usmansafderktk@gmail.com>"
+]
+readme = "README.md"
+packages = [{include = "findodo", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+openai = "^1.28.1"
+pydantic = "^2.7.1"
+pydantic-settings = "^2.2.1"  
+edgartools = "^2.27.0"        
+pypdf = "^4.2.0"              
+langchain-text-splitters = "^0.0.1"
+tiktoken = "^0.6.0"
+tqdm = "^4.66.0"
+tenacity = "^8.2.0"
+requests = "^2.31.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+pytest-dotenv = "^0.5.2"      
+ruff = "^0.4.0"               
+mypy = "^1.9.0"               
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+addopts = "-ra -q"
+env_files = [".env"]
+filterwarnings = [
+    "ignore::DeprecationWarning:edgar.*",
+    "ignore:Support for class-based `config` is deprecated"
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.mypy]
+strict = true
+ignore_missing_imports = true
