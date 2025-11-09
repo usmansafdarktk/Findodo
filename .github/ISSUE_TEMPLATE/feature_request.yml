@@ -1,0 +1,39 @@
+name: Feature request
+description: Suggest a new feature or improvement for Findodo
+title: "[Feature]: "
+labels: ["enhancement"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement! Please describe your idea below.
+  - type: input
+    id: summary
+    attributes:
+      label: Feature summary
+      placeholder: e.g. "Add SEC filing auto-download"
+      description: Short one-line description
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      placeholder: What problem does this feature solve?
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      placeholder: Describe your idea or proposed solution
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      placeholder: Are there other ways to solve this?
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      placeholder: Any mockups, examples, or related links

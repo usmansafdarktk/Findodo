@@ -1,0 +1,51 @@
+name: Bug report
+description: Report a bug or unexpected behavior in Findodo
+title: "[Bug]: "
+labels: ["bug"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the details below so we can reproduce it.
+  - type: input
+    id: summary
+    attributes:
+      label: Bug summary
+      description: Short description of the issue
+      placeholder: e.g. "Error when parsing SEC filings"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Exact steps so we can see the same issue
+      placeholder: |
+        1. Run `findodo.parse()`
+        2. Pass a PDF with X
+        3. See error ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: Describe what you expected to happen
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      placeholder: Describe what actually happened
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots
+      placeholder: Paste error messages or screenshots (if any)
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: "Output of: `poetry show findodo` or version string"
+      placeholder: "0.1.0"
