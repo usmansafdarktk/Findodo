@@ -1,0 +1,45 @@
+name: CI
+
+# Trigger on pushes to main and pull requests
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # Step 3: Install dependencies using Poetry
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry install
+
+      # Step 4: Run linter
+      - name: Lint with ruff
+        run: |
+          poetry run ruff check src tests
+
+      # Step 5: Run type checks
+      - name: Type check with mypy
+        run: |
+          poetry run mypy src
+
+      # Step 6: Run tests
+      - name: Run tests
+        run: |
+          poetry run pytest -ra -q
