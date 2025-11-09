@@ -1,4 +1,4 @@
-from typing import List, Type
+from typing import List
 from tqdm import tqdm
 
 from findodo.types import Dataset, DatasetItem, FilingItem

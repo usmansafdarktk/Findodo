@@ -2,7 +2,6 @@ import json
 import pytest
 from unittest.mock import MagicMock
 from findodo.providers.openai import OpenAIProvider
-from findodo.types import DatasetItem
 
 # 1. Define mock payloads from the OpenAI API
 

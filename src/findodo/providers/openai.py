@@ -74,7 +74,7 @@ class OpenAIProvider(Provider):
                 except ValidationError:
                     # If it fails, just log a warning and KEEP GOING.
                     # Don't crash the whole process for one bad LLM output.
-                    print(f"Warning: Dropped one malformed QA pair (missing fields).")
+                    print("Warning: Dropped one malformed QA pair (missing fields).")
                     continue
             
             return valid_items

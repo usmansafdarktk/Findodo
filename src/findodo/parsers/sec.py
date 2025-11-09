@@ -1,6 +1,6 @@
 import re
 from typing import List
-from edgar import Company, set_identity, get_filings
+from edgar import Company, set_identity
 
 from findodo.config import settings
 from findodo.types import FilingItem
