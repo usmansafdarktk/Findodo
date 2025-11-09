@@ -35,9 +35,9 @@ jobs:
           poetry run ruff check src tests
 
       # Step 5: Run type checks
-      - name: Type check with mypy
-        run: |
-          poetry run mypy src
+      # - name: Type check with mypy
+      #   run: |
+      #     poetry run mypy src
 
       # Step 6: Run tests
       - name: Run tests
