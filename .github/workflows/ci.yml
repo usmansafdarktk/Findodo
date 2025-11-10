@@ -34,12 +34,17 @@ jobs:
         run: |
           poetry run ruff check src tests
 
-      # Step 5: Run type checks
-      # - name: Type check with mypy
-      #   run: |
-      #     poetry run mypy src
+      # Step 5: Check formatting
+      - name: Check formatting with ruff
+        run: |
+          poetry run ruff format --check src tests
 
-      # Step 6: Run tests
+      # Step 6: Run type checks
+      - name: Type check with mypy
+        run: |
+          poetry run mypy src
+
+      # Step 7: Run tests
       - name: Run tests
         run: |
           poetry run pytest -ra -q

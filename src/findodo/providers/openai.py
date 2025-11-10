@@ -1,6 +1,7 @@
 import json
-from typing import List, Any, Dict
+from typing import List
 from openai import OpenAI, OpenAIError
+from openai.types.chat import ChatCompletionToolParam
 from pydantic import ValidationError
 from tenacity import retry, wait_random_exponential, stop_after_attempt, retry_if_exception_type
 
@@ -9,13 +10,14 @@ from findodo.types import DatasetItem
 from findodo.providers.base import Provider
 from findodo.prompts import DEFAULT_SYSTEM_PROMPT
 
+
 class OpenAIProvider(Provider):
     def __init__(self, model: str | None = None):
         self.client = OpenAI(api_key=settings.openai_api_key.get_secret_value())
         self.model = model or settings.default_model
 
     @property
-    def _tool_schema(self) -> List[Dict[str, Any]]:
+    def _tool_schema(self) -> List[ChatCompletionToolParam]:
         return [
             {
                 "type": "function",
@@ -47,7 +49,7 @@ class OpenAIProvider(Provider):
     @retry(
         wait=wait_random_exponential(multiplier=1, max=60),
         stop=stop_after_attempt(5),
-        retry=retry_if_exception_type(OpenAIError)
+        retry=retry_if_exception_type(OpenAIError),
     )
     def generate_qa(self, text: str, num_questions: int) -> List[DatasetItem]:
         try:
@@ -55,16 +57,30 @@ class OpenAIProvider(Provider):
                 model=self.model,
                 messages=[
                     {"role": "system", "content": DEFAULT_SYSTEM_PROMPT},
-                    {"role": "user", "content": f"Generate {num_questions} questions for this text: {text}"}
+                    {"role": "user", "content": f"Generate {num_questions} questions for this text: {text}"},
                 ],
                 tools=self._tool_schema,
                 tool_choice={"type": "function", "function": {"name": "generate_dataset"}},
                 temperature=0.0,
             )
 
-            tool_call = response.choices[0].message.tool_calls[0]
+            message = response.choices[0].message
+
+            # Guard 1: Did the model actually call a tool?
+            if not message.tool_calls:
+                print("Warning: Model did not call the generation tool.")
+                return []
+
+            tool_call = message.tool_calls[0]
+
+            # Guard 2: Is it the right *type* of tool? (Mypy needs this confirmation)
+            if tool_call.type != "function":
+                print(f"Warning: Unexpected tool type received: {tool_call.type}")
+                return []
+
+            # Now safe to access .function.arguments
             arguments = json.loads(tool_call.function.arguments)
-            
+
             # Validate with Pydantic immediately
             valid_items = []
             for item in arguments.get("items", []):
@@ -76,7 +92,7 @@ class OpenAIProvider(Provider):
                     # Don't crash the whole process for one bad LLM output.
                     print("Warning: Dropped one malformed QA pair (missing fields).")
                     continue
-            
+
             return valid_items
 
         except (IndexError, json.JSONDecodeError, AttributeError) as e:

@@ -1,10 +1,11 @@
 import re
-from typing import List
+from typing import List, Any
 from edgar import Company, set_identity
 
 from findodo.config import settings
 from findodo.types import FilingItem
 from findodo.parsers.chunker import Chunker
+
 
 class SECParser:
     def __init__(self) -> None:
@@ -17,17 +18,17 @@ class SECParser:
         # Remove newline clutter
         text = text.replace("\n", " ").strip()
         # Remove XBRL/table artifacts like "---" or "..."
-        text = re.sub(r'-{3,}|\.{3,}', '', text)
-        return re.sub(r'\+{2,}', '', text)
+        text = re.sub(r"-{3,}|\.{3,}", "", text)
+        return re.sub(r"\+{2,}", "", text)
 
     def get_10k_chunks(self, ticker: str, year: int, items: List[FilingItem] | None = None) -> List[str]:
         company = Company(ticker)
         filings = company.get_filings(form="10-K")
-        
-        #Robust filtering
+
+        # Robust filtering
         filing = next((f for f in filings if f.filing_date.year == year), None)
         if not filing:
-             raise ValueError(f"No 10-K found for {ticker} in {year}")
+            raise ValueError(f"No 10-K found for {ticker} in {year}")
 
         return self._process_filing(filing.obj(), items)
 
@@ -35,18 +36,15 @@ class SECParser:
         # More robust way to find specific 10-Qs without relying on fragile index files
         company = Company(ticker)
         filings = company.get_filings(form="10-Q")
-        
+
         # Filter by year AND quarter
-        filing = next(
-            (f for f in filings if f.filing_date.year == year and f.quarter == quarter), 
-            None
-        )
+        filing = next((f for f in filings if f.filing_date.year == year and f.quarter == quarter), None)
         if not filing:
-             raise ValueError(f"No 10-Q found for {ticker} in {year} Q{quarter}")
+            raise ValueError(f"No 10-Q found for {ticker} in {year} Q{quarter}")
 
         return self._process_filing(filing.obj(), items)
 
-    def _process_filing(self, filing_obj, items_to_filter: List[FilingItem] | None) -> List[str]:
+    def _process_filing(self, filing_obj: Any, items_to_filter: List[FilingItem] | None) -> List[str]:
         """Internal helper to extract items, clean them, and chunk them."""
         # If no items specified, grab everything available
         if not items_to_filter:
@@ -57,5 +55,5 @@ class SECParser:
 
         raw_texts = [filing_obj[item] for item in selected_items]
         cleaned_text = " ".join([self._clean_text(t) for t in raw_texts])
-        
+
         return self.chunker.split(cleaned_text)

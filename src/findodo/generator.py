@@ -7,11 +7,13 @@ from findodo.providers.openai import OpenAIProvider
 from findodo.parsers.sec import SECParser
 from findodo.parsers.pdf import PDFParser
 
+
 class Generator:
     """
     The main entry point for FinDodo.
     Orchestrates the flow between Data Parsers and LLM Providers.
     """
+
     def __init__(self, provider: Provider | None = None):
         # Dependency Injection: Use the provided LLM, or default to OpenAI
         self.provider = provider or OpenAIProvider()
@@ -36,7 +38,7 @@ class Generator:
             for i, text in enumerate(texts):
                 # Calculate how many questions this specific chunk needs
                 questions_for_chunk = base_questions + (1 if i < extra_questions else 0)
-                
+
                 if questions_for_chunk > 0:
                     new_items = self.provider.generate_qa(text, questions_for_chunk)
                     results.extend(new_items)
@@ -45,12 +47,12 @@ class Generator:
         return Dataset(items=results[:total_questions])
 
     def generate_from_sec(
-        self, 
-        ticker: str, 
-        year: int, 
-        quarter: int | None = None, 
+        self,
+        ticker: str,
+        year: int,
+        quarter: int | None = None,
         items: List[FilingItem] | None = None,
-        total_questions: int = 10
+        total_questions: int = 10,
     ) -> Dataset:
         """Generates a dataset from an SEC filing (10-K or 10-Q)."""
         if quarter:

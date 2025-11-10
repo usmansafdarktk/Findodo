@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 from findodo.types import DatasetItem
 
+
 class Provider(ABC):
     @abstractmethod
     def generate_qa(self, text: str, num_questions: int) -> List[DatasetItem]:

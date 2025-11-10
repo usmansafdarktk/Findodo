@@ -2,6 +2,7 @@ from enum import Enum
 from typing import List
 from pydantic import BaseModel, Field
 
+
 class FilingItem(str, Enum):
     ITEM_1 = "Item 1"
     ITEM_1A = "Item 1A"
@@ -25,10 +26,12 @@ class FilingItem(str, Enum):
     ITEM_15 = "Item 15"
     ITEM_16 = "Item 16"
 
+
 class DatasetItem(BaseModel):
     question: str = Field(..., description="The generated question.")
     answer: str = Field(..., description="The answer directly derived from the context.")
     context: str = Field(..., description="The specific text chunk used to generate this QA pair.")
+
 
 class Dataset(BaseModel):
     items: List[DatasetItem]

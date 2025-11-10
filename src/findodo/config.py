@@ -1,16 +1,14 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field, SecretStr
 
+
 class Settings(BaseSettings):
     """
     Centralized configuration for FinDodo.
     Reads from environment variables and .env files automatically.
     """
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        extra="ignore"
-    )
+
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     # Required: Will crash immediately with a clear error if missing
     openai_api_key: SecretStr = Field(alias="OPENAI_API_KEY")
@@ -21,5 +19,6 @@ class Settings(BaseSettings):
     chunk_size: int = 1024
     chunk_overlap: int = 100
 
+
 # Singleton instance
-settings = Settings()
+settings = Settings()  # type: ignore[call-arg]
