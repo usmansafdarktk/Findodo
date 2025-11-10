@@ -21,6 +21,9 @@ BAD_PAYLOAD_MISSING_FIELD = {
 def create_mock_api_response(payload):
     mock_response = MagicMock()
     mock_tool_call = MagicMock()
+
+    mock_tool_call.type = "function"
+    
     # The API returns the payload as a JSON *string* in `arguments`
     mock_tool_call.function.arguments = json.dumps(payload)
 
