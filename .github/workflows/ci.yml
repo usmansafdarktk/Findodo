@@ -46,5 +46,8 @@ jobs:
 
       # Step 7: Run tests
       - name: Run tests
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
+          echo "OPENAI_API_KEY=${OPENAI_API_KEY}" > .env
           poetry run pytest -ra -q
