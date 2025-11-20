@@ -9,12 +9,13 @@ from findodo.models import DatasetItem
 from findodo.core.providing import BaseProvider
 from findodo.prompts import DEFAULT_SYSTEM_PROMPT
 
+
 class OpenAIProvider(BaseProvider):
     def __init__(self, config: Any):
         super().__init__(config)
         # Logic: Use API key from config if present, otherwise rely on env var (handled by OpenAI client)
         api_key = config.api_key.get_secret_value() if config.api_key else None
-        
+
         self.client = OpenAI(api_key=api_key)
         self.model = config.model
         self.temperature = config.temperature

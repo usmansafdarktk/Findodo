@@ -5,14 +5,12 @@ from pypdf import PdfReader
 from findodo.core.parsing import BaseParser
 from findodo.parsers.chunker import Chunker
 
+
 class PDFParser(BaseParser):
     def __init__(self, config: Any, chunker_config: Any) -> None:
         super().__init__(config)
         # Pass the chunk settings explicitly
-        self.chunker = Chunker(
-            chunk_size=chunker_config.chunk_size, 
-            chunk_overlap=chunker_config.chunk_overlap
-        )
+        self.chunker = Chunker(chunk_size=chunker_config.chunk_size, chunk_overlap=chunker_config.chunk_overlap)
 
     def parse(self, target: str, **kwargs: Any) -> List[str]:
         return self.from_url(target)

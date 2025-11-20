@@ -35,12 +35,7 @@ def create_mock_api_response(payload):
 def provider():
     """Creates a fresh provider instance for each test with a mock config."""
     # We inject a dummy config with a fake key so the OpenAI client initializes without complaining
-    config = ProviderConfig(
-        name="openai", 
-        model="gpt-4-test", 
-        temperature=0.0,
-        api_key="sk-fake-key-for-testing" 
-    )
+    config = ProviderConfig(name="openai", model="gpt-4-test", temperature=0.0, api_key="sk-fake-key-for-testing")
     return OpenAIProvider(config)
 
 

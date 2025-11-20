@@ -18,10 +18,10 @@ class Generator:
     def __init__(self, config: Config, provider: Optional[BaseProvider] = None):
         # 1. Store the config
         self.config = config
-        
+
         # 2. Initialize Provider (Inject config)
         self.provider = provider or OpenAIProvider(config.provider)
-        
+
         # 3. Initialize Parsers (Inject specific parser config AND chunker config)
         self.sec_parser = SECParser(config.parser, config.chunker)
         self.pdf_parser = PDFParser(config.parser, config.chunker)

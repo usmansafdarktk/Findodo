@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Any
 from findodo.models import DatasetItem
 
+
 class BaseProvider(ABC):
     """
     The contract that all LLM Providers (OpenAI, Azure, Local) must follow.

@@ -1,5 +1,6 @@
 from langchain_text_splitters import TokenTextSplitter
 
+
 class Chunker:
     """
     Standardized text splitter.

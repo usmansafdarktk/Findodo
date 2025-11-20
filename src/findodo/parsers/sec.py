@@ -6,21 +6,19 @@ from findodo.models import FilingItem
 from findodo.core.parsing import BaseParser
 from findodo.parsers.chunker import Chunker
 
+
 class SECParser(BaseParser):
     def __init__(self, config: Any, chunker_config: Any) -> None:
         super().__init__(config)
         # Initialize Chunker by passing values from the config
-        self.chunker = Chunker(
-            chunk_size=chunker_config.chunk_size, 
-            chunk_overlap=chunker_config.chunk_overlap
-        )
-        
+        self.chunker = Chunker(chunk_size=chunker_config.chunk_size, chunk_overlap=chunker_config.chunk_overlap)
+
         # For Phase 1, we set a default identity or assume EDGAR_IDENTITY env var is set.
         # In Phase 2, we will move this explicitly into the ParserConfig.
         try:
             set_identity("FinDodo Research findodo@example.com")
         except Exception:
-            pass 
+            pass
 
     def _clean_text(self, text: str) -> str:
         text = text.replace("\n", " ").strip()
@@ -32,10 +30,10 @@ class SECParser(BaseParser):
         year = kwargs.get("year")
         if not year:
             raise ValueError("Year is required for SEC parsing")
-        
+
         items = kwargs.get("items")
         quarter = kwargs.get("quarter")
-        
+
         if quarter:
             return self.get_10q_chunks(target, year, quarter, items)
         else:
