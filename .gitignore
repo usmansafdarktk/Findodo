@@ -1,5 +1,9 @@
-__pycache__
-.pytest_cache
+__pycache__/
+.pytest_cache/
 .env
 venv
 poetry.lock
+.ruff_cache
+.pytest_cache
+.mypy_cache
+outputs/

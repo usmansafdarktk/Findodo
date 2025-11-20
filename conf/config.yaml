@@ -1,0 +1,18 @@
+# The Defaults List tells Hydra what to load if the user doesn't specify anything.
+defaults:
+  - _self_
+  - parser: sec         
+  - provider: openai    
+  - chunker: token      
+
+# Global Settings
+seed: 42
+output_dir: "data/processed"
+
+# Hydra Logging Configuration
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}

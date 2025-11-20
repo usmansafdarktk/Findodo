@@ -1,20 +1,23 @@
 import json
-from typing import List
+from typing import List, Any
 from openai import OpenAI, OpenAIError
 from openai.types.chat import ChatCompletionToolParam
 from pydantic import ValidationError
 from tenacity import retry, wait_random_exponential, stop_after_attempt, retry_if_exception_type
 
-from findodo.config import settings
-from findodo.types import DatasetItem
-from findodo.providers.base import Provider
+from findodo.models import DatasetItem
+from findodo.core.providing import BaseProvider
 from findodo.prompts import DEFAULT_SYSTEM_PROMPT
 
-
-class OpenAIProvider(Provider):
-    def __init__(self, model: str | None = None):
-        self.client = OpenAI(api_key=settings.openai_api_key.get_secret_value())
-        self.model = model or settings.default_model
+class OpenAIProvider(BaseProvider):
+    def __init__(self, config: Any):
+        super().__init__(config)
+        # Logic: Use API key from config if present, otherwise rely on env var (handled by OpenAI client)
+        api_key = config.api_key.get_secret_value() if config.api_key else None
+        
+        self.client = OpenAI(api_key=api_key)
+        self.model = config.model
+        self.temperature = config.temperature
 
     @property
     def _tool_schema(self) -> List[ChatCompletionToolParam]:
@@ -61,40 +64,31 @@ class OpenAIProvider(Provider):
                 ],
                 tools=self._tool_schema,
                 tool_choice={"type": "function", "function": {"name": "generate_dataset"}},
-                temperature=0.0,
+                temperature=self.temperature,
             )
 
             message = response.choices[0].message
 
-            # Guard 1: Did the model actually call a tool?
             if not message.tool_calls:
                 print("Warning: Model did not call the generation tool.")
                 return []
 
             tool_call = message.tool_calls[0]
-
-            # Guard 2: Is it the right *type* of tool? (Mypy needs this confirmation)
+            # MyPy Guard: Ensure it's a function tool
             if tool_call.type != "function":
-                print(f"Warning: Unexpected tool type received: {tool_call.type}")
                 return []
-
-            # Now safe to access .function.arguments
             arguments = json.loads(tool_call.function.arguments)
 
-            # Validate with Pydantic immediately
             valid_items = []
             for item in arguments.get("items", []):
                 try:
-                    # Try to validate this specific item
                     valid_items.append(DatasetItem(**item))
                 except ValidationError:
-                    # If it fails, just log a warning and KEEP GOING.
-                    # Don't crash the whole process for one bad LLM output.
                     print("Warning: Dropped one malformed QA pair (missing fields).")
                     continue
 
             return valid_items
 
-        except (IndexError, json.JSONDecodeError, AttributeError) as e:
+        except Exception as e:
             print(f"Error parsing OpenAI response: {e}")
             return []

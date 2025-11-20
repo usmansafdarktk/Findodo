@@ -2,6 +2,7 @@ import json
 import pytest
 from unittest.mock import MagicMock
 from findodo.providers.openai import OpenAIProvider
+from findodo.config import ProviderConfig
 
 # 1. Define mock payloads from the OpenAI API
 
@@ -11,7 +12,6 @@ GOOD_PAYLOAD = {
 }
 
 # This is the "bad" response (The second item is missing the 'context' field)
-# that crashed the old library
 BAD_PAYLOAD_MISSING_FIELD = {
     "items": [{"question": "q1", "answer": "a1", "context": "c1"}, {"question": "q_bad", "answer": "a_bad"}]
 }
@@ -22,9 +22,8 @@ def create_mock_api_response(payload):
     mock_response = MagicMock()
     mock_tool_call = MagicMock()
 
-    mock_tool_call.type = "function"
-
     # The API returns the payload as a JSON *string* in `arguments`
+    mock_tool_call.type = "function"
     mock_tool_call.function.arguments = json.dumps(payload)
 
     mock_response.choices = [MagicMock()]
@@ -34,8 +33,15 @@ def create_mock_api_response(payload):
 
 @pytest.fixture
 def provider():
-    """Creates a fresh provider instance for each test."""
-    return OpenAIProvider()
+    """Creates a fresh provider instance for each test with a mock config."""
+    # We inject a dummy config with a fake key so the OpenAI client initializes without complaining
+    config = ProviderConfig(
+        name="openai", 
+        model="gpt-4-test", 
+        temperature=0.0,
+        api_key="sk-fake-key-for-testing" 
+    )
+    return OpenAIProvider(config)
 
 
 def test_generate_qa_success(provider, monkeypatch):

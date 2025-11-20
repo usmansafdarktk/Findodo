@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List
-from findodo.types import DatasetItem
+from findodo.models import DatasetItem
 
 
 class Provider(ABC):

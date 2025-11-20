@@ -1,24 +1,42 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field, SecretStr
+from typing import Optional
+from pydantic import BaseModel, Field, SecretStr
 
 
-class Settings(BaseSettings):
+#  Sub-Configurations 
+class ChunkerConfig(BaseModel):
+    name: str = "token"
+    chunk_size: int = Field(1024, gt=0, description="Tokens per chunk")
+    chunk_overlap: int = Field(100, ge=0, description="Overlap between chunks")
+
+class ParserConfig(BaseModel):
+    name: str
+    include_tables: bool = Field(False, description="Whether to parse tables separately")
+    # We allow extra fields because different parsers (SEC vs PDF) have different settings
+    model_config = {"extra": "allow"}
+
+class ProviderConfig(BaseModel):
+    name: str
+    model: str
+    api_key: Optional[SecretStr] = Field(None, description="API Key (loaded from env if None)")
+    temperature: float = Field(0.0, ge=0.0, le=1.0)
+    # Allow extra fields for different providers (OpenAI vs Azure)
+    model_config = {"extra": "allow"}
+
+
+#  Master Configuration 
+class Config(BaseModel):
     """
-    Centralized configuration for FinDodo.
-    Reads from environment variables and .env files automatically.
+    The Master Configuration Object.
+    Hydra will populate this from YAMLs, and Pydantic will validate strict types.
     """
+    # Sub-configs
+    chunker: ChunkerConfig
+    parser: ParserConfig
+    provider: ProviderConfig
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
-
-    # Required: Will crash immediately with a clear error if missing
-    openai_api_key: SecretStr = Field(alias="OPENAI_API_KEY")
-
-    # Defaults
-    default_model: str = "gpt-4-turbo-preview"
-    sec_identity: str = "FinDodo Research findodo@example.com"
-    chunk_size: int = 1024
-    chunk_overlap: int = 100
-
-
-# Singleton instance
-settings = Settings()  # type: ignore[call-arg]
+    # Global settings
+    seed: int = 42
+    output_dir: str = "data/processed"
+    
+    # Allow Hydra's internal keys (like hydra.run.dir) to exist without crashing Pydantic
+    model_config = {"extra": "ignore"}

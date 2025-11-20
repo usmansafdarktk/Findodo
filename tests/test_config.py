@@ -1,9 +1,13 @@
-import os
-from findodo.config import settings
+from findodo.config import Config, ChunkerConfig, ParserConfig, ProviderConfig
 
-
-def test_settings_load_from_env():
-    """Tests that the config loader finds the .env file and loads the key."""
-    assert settings.openai_api_key.get_secret_value() == os.environ.get("OPENAI_API_KEY")
-    assert settings.default_model is not None
-    assert settings.sec_identity is not None
+def test_config_structure():
+    """Tests that we can manually instantiate the config."""
+    # Simulate data from Hydra
+    cfg = Config(
+        chunker=ChunkerConfig(chunk_size=512),
+        parser=ParserConfig(name="sec"),
+        provider=ProviderConfig(name="openai", model="gpt-3.5"),
+        seed=123
+    )
+    assert cfg.chunker.chunk_size == 512
+    assert cfg.seed == 123
