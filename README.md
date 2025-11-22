@@ -3,7 +3,7 @@
 </p>
 FinDodo is an open-source Python library and research framework for generating QA and conversational financial datasets from real-world sources using LLMs. It incorporates systematic experimentation and validation workflows, with the goal of eventually evolving into a unified platform for financial NLP benchmarking.
 <br>
-It is designed for **Reproducibility** and **Experimentation**, utilizing **Hydra** for configuration management, **MLflow** for experiment tracking, and **DVC** for data versioning.
+It is designed for \*\*Reproducibility\*\* and \*\*Experimentation\*\*, utilizing \*\*Hydra\*\* for configuration management, \*\*MLflow\*\* for experiment tracking, and \*\*DVC\*\* for data versioning.
 
 
 ## Key Features
@@ -86,3 +86,4 @@ Please see [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for details.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
