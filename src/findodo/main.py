@@ -1,10 +1,15 @@
 import hydra
+import mlflow
+import os
+from typing import Dict, Any, cast
 from dotenv import load_dotenv
 from omegaconf import DictConfig, OmegaConf
+from hydra.utils import get_original_cwd
+
 from findodo.config import Config
 from findodo.generator import Generator
 
-# Load environment variables from .env file immediately
+# Load environment variables immediately
 load_dotenv()
 
 
@@ -13,37 +18,40 @@ load_dotenv()
 def main(cfg: DictConfig) -> None:
     """
     The main application entry point.
-    1. Loads YAML config via Hydra.
-    2. Validates it via Pydantic.
-    3. Initializes the Generator.
+    Wraps execution in an MLflow run for scientific tracking.
     """
 
-    # 1. Validate Config
-    # Convert Hydra's internal format to a standard Python dictionary
-    raw_config = OmegaConf.to_container(cfg, resolve=True)
+    # 1. Setup MLflow
+    tracking_uri = f"file://{os.path.join(get_original_cwd(), 'mlruns')}"
+    mlflow.set_tracking_uri(tracking_uri)
+    mlflow.set_experiment("FinDodo_Phase1_Experiments")
 
-    try:
-        # Pass it through our strict Pydantic model
-        # If kwargs like 'ticker' are passed, they are ignored by Pydantic
-        # (due to extra="ignore") but remain in 'cfg' for us to use later.
-        validated_config = Config(**raw_config)  # type: ignore
-    except Exception as e:
-        print(f"Configuration Error: {e}")
-        return
+    # 2. Start the Run
+    with mlflow.start_run() as run:
+        print(f"MLflow Run ID: {run.info.run_id}")
 
-    print("FinDodo initialized successfully!")
-    print(f" Output: {validated_config.output_dir}")
-    print(f" Parser: {validated_config.parser.name}")
-    print(f" Provider: {validated_config.provider.name}")
+        # 3. Log all Hydra parameters
+        params = cast(Dict[str, Any], OmegaConf.to_container(cfg, resolve=True))
+        mlflow.log_params(params)
 
-    # 2. Initialize the Generator
-    # This proves that our Dependency Injection works
-    generator = Generator(validated_config)
+        # 4. Validate Config (Pydantic)
+        try:
+            validated_config = Config(**params)
+        except Exception as e:
+            print(f"Configuration Error: {e}")
+            mlflow.set_tag("status", "failed")
+            return
 
-    print(f"Instance created: {generator}")
+        print("FinDodo initialized successfully!")
+        print(f"Output: {validated_config.output_dir}")
+        print(f"Parser: {validated_config.parser.name}")
+        print(f"Provider: {validated_config.provider.name}")
 
-    print("\nSystem is ready. Use command line arguments to run specific tasks.")
-    print("   Example: python src/findodo/main.py parser=pdf")
+        # 5. Initialize the Generator
+        generator = Generator(validated_config)
+        print(f"Instance created: {generator}")
+
+        print("\nSystem is ready. MLflow tracking is active.")
 
 
 if __name__ == "__main__":
