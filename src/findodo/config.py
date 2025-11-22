@@ -25,6 +25,11 @@ class ProviderConfig(BaseModel):
     model_config = {"extra": "allow"}
 
 
+class PromptConfig(BaseModel):
+    name: str
+    system_prompt: str
+
+
 #  Master Configuration
 class Config(BaseModel):
     """
@@ -36,6 +41,7 @@ class Config(BaseModel):
     chunker: ChunkerConfig
     parser: ParserConfig
     provider: ProviderConfig
+    prompt: PromptConfig
 
     # Global settings
     seed: int = 42

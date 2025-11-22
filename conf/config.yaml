@@ -3,7 +3,8 @@ defaults:
   - _self_
   - parser: sec         
   - provider: openai    
-  - chunker: token      
+  - chunker: token  
+  - prompt: default    
 
 # Global Settings
 seed: 42

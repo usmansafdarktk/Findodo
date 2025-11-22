@@ -7,12 +7,11 @@ from tenacity import retry, wait_random_exponential, stop_after_attempt, retry_i
 
 from findodo.models import DatasetItem
 from findodo.core.providing import BaseProvider
-from findodo.prompts import DEFAULT_SYSTEM_PROMPT
 
 
 class OpenAIProvider(BaseProvider):
-    def __init__(self, config: Any):
-        super().__init__(config)
+    def __init__(self, config: Any, prompt_config: Any):
+        super().__init__(config, prompt_config)
         # Logic: Use API key from config if present, otherwise rely on env var (handled by OpenAI client)
         api_key = config.api_key.get_secret_value() if config.api_key else None
 
@@ -60,7 +59,7 @@ class OpenAIProvider(BaseProvider):
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": DEFAULT_SYSTEM_PROMPT},
+                    {"role": "system", "content": self.prompt_config.system_prompt},
                     {"role": "user", "content": f"Generate {num_questions} questions for this text: {text}"},
                 ],
                 tools=self._tool_schema,

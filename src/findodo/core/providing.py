@@ -8,11 +8,12 @@ class BaseProvider(ABC):
     The contract that all LLM Providers (OpenAI, Azure, Local) must follow.
     """
 
-    def __init__(self, config: Any):
+    def __init__(self, config: Any, prompt_config: Any):
         """
         All providers are initialized with their specific sub-config.
         """
         self.config = config
+        self.prompt_config = prompt_config
 
     @abstractmethod
     def generate_qa(self, text: str, num_questions: int) -> List[DatasetItem]:

@@ -2,7 +2,7 @@ import json
 import pytest
 from unittest.mock import MagicMock
 from findodo.providers.openai import OpenAIProvider
-from findodo.config import ProviderConfig
+from findodo.config import ProviderConfig, PromptConfig
 
 # 1. Define mock payloads from the OpenAI API
 
@@ -33,28 +33,34 @@ def create_mock_api_response(payload):
 
 @pytest.fixture
 def provider():
-    """Creates a fresh provider instance for each test with a mock config."""
-    # We inject a dummy config with a fake key so the OpenAI client initializes without complaining
+    """Creates a fresh provider instance for each test with mock configs."""
+    # 1. Create dummy Provider Config
     config = ProviderConfig(name="openai", model="gpt-4-test", temperature=0.0, api_key="sk-fake-key-for-testing")
-    return OpenAIProvider(config)
+
+    # 2. Create dummy Prompt Config
+    prompt_config = PromptConfig(name="default", system_prompt="You are a helpful assistant.")
+
+    # 3. Inject both into the Provider
+    return OpenAIProvider(config, prompt_config)
 
 
 def test_generate_qa_success(provider, monkeypatch):
     """Tests the happy path: a good API response is parsed correctly."""
-    # 1. Create a mock for the client's `create` method
     mock_create = MagicMock(return_value=create_mock_api_response(GOOD_PAYLOAD))
-
-    # 2. "monkeypatch" the real client, replacing its `create` method with our mock
     monkeypatch.setattr(provider.client.chat.completions, "create", mock_create)
 
-    # 3. Run the function
     result = provider.generate_qa("some text", 2)
 
-    # 4. Assert
     assert len(result) == 2
     assert result[0].question == "q1"
     assert result[1].answer == "a2"
-    mock_create.assert_called_once()  # Ensure the mock was actually called
+
+    # Verify that the system prompt was actually passed to the API
+    call_args = mock_create.call_args
+    # The 'messages' list is the 2nd argument in the call kwargs
+    messages = call_args.kwargs["messages"]
+    assert messages[0]["role"] == "system"
+    assert messages[0]["content"] == "You are a helpful assistant."
 
 
 def test_generate_qa_robustness_skips_bad_item(provider, monkeypatch, capsys):
@@ -63,17 +69,13 @@ def test_generate_qa_robustness_skips_bad_item(provider, monkeypatch, capsys):
     Ensures that when the API returns a malformed item,
     we log a warning and return *only* the valid items, NOT crash.
     """
-    # 1. Mock the `create` method to return the BAD payload
     mock_create = MagicMock(return_value=create_mock_api_response(BAD_PAYLOAD_MISSING_FIELD))
     monkeypatch.setattr(provider.client.chat.completions, "create", mock_create)
 
-    # 2. Run the function
     result = provider.generate_qa("some text", 2)
 
-    # 3. Assert: The key test! We should get 1 valid item back, not 0 and not a crash
     assert len(result) == 1
     assert result[0].question == "q1"
 
-    # 4. Assert that we printed the warning
-    captured = capsys.readouterr()  # capsys is a pytest fixture to capture print()
+    captured = capsys.readouterr()
     assert "Warning: Dropped one malformed QA pair" in captured.out

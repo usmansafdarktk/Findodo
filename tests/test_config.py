@@ -1,4 +1,4 @@
-from findodo.config import Config, ChunkerConfig, ParserConfig, ProviderConfig
+from findodo.config import Config, ChunkerConfig, ParserConfig, ProviderConfig, PromptConfig
 
 
 def test_config_structure():
@@ -8,6 +8,7 @@ def test_config_structure():
         chunker=ChunkerConfig(chunk_size=512),
         parser=ParserConfig(name="sec"),
         provider=ProviderConfig(name="openai", model="gpt-3.5"),
+        prompt=PromptConfig(name="default", system_prompt="Sys Prompt"),
         seed=123,
     )
     assert cfg.chunker.chunk_size == 512

@@ -20,7 +20,7 @@ class Generator:
         self.config = config
 
         # 2. Initialize Provider (Inject config)
-        self.provider = provider or OpenAIProvider(config.provider)
+        self.provider = provider or OpenAIProvider(config.provider, config.prompt)
 
         # 3. Initialize Parsers (Inject specific parser config AND chunker config)
         self.sec_parser = SECParser(config.parser, config.chunker)

@@ -1,5 +1,5 @@
 from findodo.generator import Generator
-from findodo.config import Config, ChunkerConfig, ParserConfig, ProviderConfig
+from findodo.config import Config, ChunkerConfig, ParserConfig, ProviderConfig, PromptConfig
 
 
 def test_generator_initialization():
@@ -12,6 +12,7 @@ def test_generator_initialization():
         chunker=ChunkerConfig(chunk_size=100, chunk_overlap=10),
         parser=ParserConfig(name="sec", include_tables=False),
         provider=ProviderConfig(name="openai", model="gpt-test"),
+        prompt=PromptConfig(name="test", system_prompt="Test Prompt"),
         seed=999,
         output_dir="data/test",
     )
