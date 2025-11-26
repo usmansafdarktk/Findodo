@@ -1,6 +1,6 @@
 import hydra
 import mlflow
-import os
+from pathlib import Path
 from typing import Dict, Any, cast
 from dotenv import load_dotenv
 from omegaconf import DictConfig, OmegaConf
@@ -22,7 +22,13 @@ def main(cfg: DictConfig) -> None:
     """
 
     # 1. Setup MLflow
-    tracking_uri = f"file://{os.path.join(get_original_cwd(), 'mlruns')}"
+    # Use .as_uri() to convert Windows paths (C:\...) into valid URIs (file:///C:/...)
+    # This satisfies MLflow on Windows, Linux, and Mac.
+    tracking_path = Path(get_original_cwd()) / "mlruns"
+    tracking_path.mkdir(exist_ok=True)  # Ensure folder exists
+
+    tracking_uri = tracking_path.as_uri()
+
     mlflow.set_tracking_uri(tracking_uri)
     mlflow.set_experiment("FinDodo_Phase1_Experiments")
 
@@ -50,6 +56,10 @@ def main(cfg: DictConfig) -> None:
         # 5. Initialize the Generator
         generator = Generator(validated_config)
         print(f"Instance created: {generator}")
+
+        # Check for Docling parser
+        if validated_config.parser.name == "docling":
+            print("Docling Parser is active.")
 
         print("\nSystem is ready. MLflow tracking is active.")
 

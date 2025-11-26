@@ -7,6 +7,7 @@ from findodo.core.providing import BaseProvider
 from findodo.providers.openai import OpenAIProvider
 from findodo.parsers.sec import SECParser
 from findodo.parsers.pdf import PDFParser
+from findodo.parsers.docling import DoclingParser
 
 
 class Generator:
@@ -25,6 +26,7 @@ class Generator:
         # 3. Initialize Parsers (Inject specific parser config AND chunker config)
         self.sec_parser = SECParser(config.parser, config.chunker)
         self.pdf_parser = PDFParser(config.parser, config.chunker)
+        self.docling_parser = DoclingParser(config.parser, config.chunker)
 
     def generate_from_texts(self, texts: List[str], total_questions: int = 10) -> Dataset:
         results: List[DatasetItem] = []
@@ -68,4 +70,14 @@ class Generator:
         print(f"Downloading and parsing PDF from {url}...")
         chunks = self.pdf_parser.parse(url)
         print(f"Processing {len(chunks)} text chunks...")
+        return self.generate_from_texts(chunks, total_questions)
+
+    def generate_from_docling(self, url_or_path: str, total_questions: int = 10) -> Dataset:
+        """
+        Generates a dataset using the advanced Docling parser.
+        Best for documents with heavy tables.
+        """
+        print("Starting Docling generation pipeline...")
+        chunks = self.docling_parser.parse(url_or_path)
+        print(f"Docling extraction complete. Processing {len(chunks)} chunks...")
         return self.generate_from_texts(chunks, total_questions)

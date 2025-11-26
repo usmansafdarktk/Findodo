@@ -1,0 +1,6 @@
+name: docling
+# Docling specific settings
+# "md" exports to Markdown (best for LLMs), "json" or "text" are other options.
+export_format: md 
+# If true, it attempts to OCR scanned PDFs (slower but necessary for images)
+enable_ocr: true
