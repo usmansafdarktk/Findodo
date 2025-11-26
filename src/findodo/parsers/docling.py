@@ -12,7 +12,7 @@ class DoclingParser(BaseParser):
     def __init__(self, config: Any, chunker_config: Any) -> None:
         super().__init__(config)
         self.chunker = Chunker(chunk_size=chunker_config.chunk_size, chunk_overlap=chunker_config.chunk_overlap)
-        self._converter = None
+        self._converter: Any = None
 
     @property
     def converter(self) -> Any:
