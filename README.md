@@ -1,9 +1,9 @@
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/922c6599-15f9-4821-b550-1b4a151c64ad" width="70%" alt="FinDodo Banner">
+  <img src="https://github.com/user-attachments/assets/922c6599-15f9-4821-b550-1b4a151c64ad" width="60%" alt="FinDodo Banner">
 </p>
-FinDodo is an open-source Python library and research framework for generating QA and conversational financial datasets from real-world sources using LLMs. It incorporates systematic experimentation and validation workflows, with the goal of eventually evolving into a unified platform for financial NLP benchmarking.
-<br>
-It is designed for **Reproducibility** and **Experimentation**, utilizing **Hydra** for configuration management, **MLflow** for experiment tracking, and **DVC** for data versioning.
+
+# FinDodo
+FinDodo is an open-source Python library and research framework for generating QA and conversational financial datasets from real-world sources using LLMs. It incorporates systematic experimentation and validation workflows, with the goal of eventually evolving into a unified platform for financial NLP benchmarking. It is designed for **Reproducibility** and **Experimentation**, utilizing **Hydra** for configuration management, **MLflow** for experiment tracking, and **DVC** for data versioning.
 
 
 ## Key Features
@@ -74,15 +74,15 @@ We maintain a comprehensive test suite including unit tests, integration tests, 
 poetry run pytest
 ```
 
-## 🤝 Contributing
-We welcome contributions! The general steps to making a contribution are as follows:
+## Contributing
+We welcome contributions! The general steps to making a contribution are as follows. Please see [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for details.
 1. Fork the repo
 2. Create a feature branch
 3. Commit your changes
 4. Push to the branch
 5. Create a new Pull Request
-Please see [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for details.
 
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
